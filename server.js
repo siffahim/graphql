@@ -4,6 +4,9 @@ const { expressMiddleware } = require("@apollo/server/express4");
 const cors = require("cors");
 const { default: axios } = require("axios");
 
+const { USERS } = require("./user");
+const { TODOS } = require("./todo");
+
 async function startServer() {
   const app = express();
   const server = new ApolloServer({
@@ -32,6 +35,16 @@ async function startServer() {
         `,
     resolvers: {
       Todo: {
+        user: async (todo) => USERS.find((u) => u.id === todo.id),
+      },
+      Query: {
+        getTodos: TODOS,
+        getAllUsers: USERS,
+        getUser: (parent, { id }) => USERS.find((u) => u.id === id),
+      },
+    },
+    /* resolvers: {
+      Todo: {
         user: async (todo) =>
           (
             await axios.get(
@@ -49,7 +62,7 @@ async function startServer() {
           (await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`))
             .data,
       },
-    },
+    }, */
   });
 
   app.use(cors());
